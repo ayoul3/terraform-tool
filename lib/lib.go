@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/prometheus/common/log"
 )
 
 const tfExtension = ".txt"
@@ -36,7 +38,7 @@ func PrintComponents(path, tag string) error {
 		}
 		listComponent[dir] = true
 	}
-
+	log.Infof("Found %d components", len(listComponent))
 	for k, _ := range listComponent {
 		fmt.Println(k)
 	}
