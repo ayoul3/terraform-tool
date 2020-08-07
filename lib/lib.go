@@ -57,7 +57,7 @@ func GetAffectedComponents(path, modulePath string) []string {
 	modulePatternRe := regexp.MustCompile(modulePattern)
 
 	filepath.Walk(path, func(path string, f os.FileInfo, _ error) error {
-		if f.IsDir() || strings.HasPrefix(path, ".") || !strings.HasSuffix(f.Name(), tfExtension) {
+		if f.IsDir() || !strings.HasSuffix(f.Name(), tfExtension) {
 			return nil
 		}
 		data, _ := ioutil.ReadFile(path)
