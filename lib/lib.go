@@ -12,31 +12,20 @@ import (
 	"github.com/prometheus/common/log"
 )
 
-const tfExtension = ".txt"
+const tfExtension = ".tf"
 
-func PrintComponents(path, tag string) error {
+func PrintComponents(path, tag string) (err error) {
+	var fileList []string
 	listComponent := make(map[string]bool, 0)
 
-	fileList, err := getGitMasterDiff(tag)
-
-	if err != nil {
-		return err
+	if fileList, err = getGitMasterDiff(tag); err != nil {
+		return
 	}
+
 	for _, file := range fileList {
-		dir := filepath.Dir(file)
-		if dir == path {
-			continue
+		for _, c := range LookupComponents(path, file) {
+			listComponent[c] = true
 		}
-		if strings.Contains(dir, "module") {
-			for _, c := range GetAffectedComponents(path, dir) {
-				listComponent[c] = true
-			}
-			continue
-		}
-		if !ContainsTFFiles(dir) {
-			continue
-		}
-		listComponent[dir] = true
 	}
 	log.Infof("Found %d components", len(listComponent))
 	for k, _ := range listComponent {
@@ -44,6 +33,21 @@ func PrintComponents(path, tag string) error {
 	}
 
 	return nil
+}
+
+func LookupComponents(path, file string) []string {
+	dir := filepath.Dir(file)
+	if dir == path {
+		return []string{}
+	}
+	if strings.Contains(dir, "module") {
+		return GetAffectedComponents(path, dir)
+	}
+	if !ContainsTFFiles(dir) {
+		return []string{}
+	}
+
+	return []string{dir}
 }
 
 func GetAffectedComponents(path, modulePath string) []string {
@@ -81,13 +85,11 @@ func getGitMasterDiff(tag string) ([]string, error) {
 }
 
 func ContainsTFFiles(path string) bool {
-	var found bool
-	filepath.Walk(path, func(path string, f os.FileInfo, _ error) error {
-		if !f.IsDir() && strings.HasSuffix(f.Name(), tfExtension) {
-			found = true
-			return nil
+	files, _ := ioutil.ReadDir(path)
+	for _, f := range files {
+		if strings.HasSuffix(f.Name(), tfExtension) {
+			return true
 		}
-		return nil
-	})
-	return found
+	}
+	return false
 }

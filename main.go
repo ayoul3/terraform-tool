@@ -11,7 +11,7 @@ import (
 var folderName, tag string
 
 func init() {
-	flag.StringVar(&folderName, "diff", ".", "subfolder to check for diff")
+	flag.StringVar(&folderName, "path", ".", "subfolder to check for diff")
 	flag.StringVar(&tag, "tag", "origin/master", "Tag or branch name to diff against")
 	flag.Parse()
 }
