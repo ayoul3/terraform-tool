@@ -14,24 +14,19 @@ import (
 
 const tfExtension = ".tf"
 
-func PrintComponents(path, tag string) (err error) {
+func StartWork(folderName, tag string) (err error) {
 	var fileList []string
-	listComponent := make(map[string]bool, 0)
-
 	if fileList, err = getGitMasterDiff(tag); err != nil {
 		return
 	}
 
-	for _, file := range fileList {
-		for _, c := range LookupComponents(path, file) {
-			listComponent[c] = true
-		}
-	}
-	log.Infof("Found %d components", len(listComponent))
-	for k, _ := range listComponent {
-		fmt.Println(k)
-	}
+	log.Infof("Found %d files changed", len(fileList))
+	Output = make(chan []string, len(fileList))
 
+	for _, file := range fileList {
+		Chan <- file
+	}
+	Report()
 	return nil
 }
 
