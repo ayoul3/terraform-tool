@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 )
 
 const tfExtension = ".tf"

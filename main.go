@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/ayoul3/terraform-tool/lib"
-	"github.com/prometheus/common/log"
+	log "github.com/sirupsen/logrus"
 )
 
 var folderName, tag string
